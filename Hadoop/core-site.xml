@@ -1,0 +1,17 @@
+<configuration>
+
+ <property>
+
+   <name>fs.default.name</name>
+
+   <value>hdfs://localhost:9000</value>
+
+ </property>  <property>
+
+   <name>hadoop.http.staticuser.user</name>
+
+   <value>hdfs</value>
+
+ </property>
+
+</configuration>
