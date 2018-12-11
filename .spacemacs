@@ -48,7 +48,7 @@ values."
      emacs-lisp
      git
      markdown
-     (python :variables python-auto-set-local-pyenv-version on-visit)
+     (python :variables python-auto-set-local-pyenv-version 'on-visit)
      syntax-checking
      shell
      docker
