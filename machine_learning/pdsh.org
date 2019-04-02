@@ -1,0 +1,8 @@
+[[https://jakevdp.github.io/PythonDataScienceHandbook/][Python Data Science Handbook]]
+
+* What is Machine Learning?
+** Categories of Machine Learning
+*** Supervised Learning
+    Modeling the relationship between measured features of data ans dome label associated with the data;
+    once this model is determined, it can be used to apply labels to new, unknown data.
+*** Unsupervised Learning
