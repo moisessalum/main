@@ -5,4 +5,36 @@
 *** Supervised Learning
     Modeling the relationship between measured features of data ans dome label associated with the data;
     once this model is determined, it can be used to apply labels to new, unknown data.
+**** Classification
+     Discrete categories.
+**** Regression
+     Continuous quantities.
 *** Unsupervised Learning
+    Modeling the features of a dataset without reference to any label.
+    Some examples:
+**** Clustering
+     Identify distinct groups of data.
+**** Dimensionality reduction
+     Search for more succinct representations of the data.
+
+* Introducing Scikit-Learn
+** Data Representation in Scikit-Learn
+*** Data as table
+**** Features matrix
+     Matrix with [n_samples, n_features] (called x).
+**** Target array
+     Label or target array (called y). Usually one dimensional with length n_samples.
+** Scikit-Learn's Estimator API
+*** Consistency
+*** Inspection
+*** Limited Object Hierarchy
+*** Composition
+*** Sensible Defaults
+** Basics of the API
+*** Choose a class of model by importing the appropriate estimator class from Scikit-Learn.
+*** Choose model hyperparameters by instantiating this class with desired values.
+*** Arrange data into a features matrix and target vector following the discussion above.
+*** Fit the model to your data by calling the "fit()" method of the model instance.
+*** Apply the model to new data:
+**** For supervised learning, often we predict lables for the unknown data using the "predict()" method.
+**** For unsupervised learning, we often transform or infer properties of the data using the "transform()" or "predict()" method.
