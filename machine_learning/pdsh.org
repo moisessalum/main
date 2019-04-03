@@ -38,3 +38,49 @@
 *** Apply the model to new data:
 **** For supervised learning, often we predict lables for the unknown data using the "predict()" method.
 **** For unsupervised learning, we often transform or infer properties of the data using the "transform()" or "predict()" method.
+** Supervised learning example: Simple linear regression
+   Fitting a line to (x,y) data. (To edit src C-c ')
+
+   #+BEGIN_SRC python
+     import matplotlib.pyplot as plt
+     import numpy as np
+     from sklearn.linear_model import LinearRegression
+
+     # Generate data
+     rng = np.random.RandomState(42)
+     x = 10 * rng.rand(50)
+     y = 2 * x - 1 + rng.randn(50)
+     plt.scatter(x, y)
+
+     # Choose a class of model (LinearRegression)
+     # Choose model hyperparameters
+     model = LinearRegression(fit_intercept=True)
+     # Arrange data into a features matrix and target vector
+     X = x[:, np.newaxis]
+     print(X.shape)
+     # Fit the model to your data
+     model.fit(X, y)
+     print(model.coef_)
+     print(model.intercept_)
+     # Predict labels for unknown data
+     xfit = np.linspace(-1, 11)
+     Xfit = xfit[:, np.newaxis]
+     yfit = model.predict(Xfit)
+   #+END_SRC
+** Supervised learning example: Iris classification
+   We will use Gaussian naive Bayes (GnB).
+   Fast with no hyperparameters to choose, GnB is often a good model to use as a baseline classification.
+
+   #+BEGIN_SRC python
+     from sklearn.cross_validation import train_test_split
+     from sklearn.naive_bayes import GaussianNB
+     from sklearn.metrics import accuarcy_score
+
+     # Generate training set and testing set
+     Xtrain, Xtest, ytrain, ytest = train_test_split(X_iris, y_iris, random_state=1)
+     # Follow Basics of the API steps
+     model = GaussianNB()
+     model.fit(Xtrain, ytrain)
+     y_model = model.predict(Xtest)
+     print(accuarcy_score(ytest, y_model))
+   #+END_SRC
