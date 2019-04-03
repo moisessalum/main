@@ -1,7 +1,7 @@
 [[https://jakevdp.github.io/PythonDataScienceHandbook/][Python Data Science Handbook]]
 
 * What is Machine Learning?
-** Categories of Machine Learning
+** [#B] Categories of Machine Learning
 *** Supervised Learning
     Modeling the relationship between measured features of data ans dome label associated with the data;
     once this model is determined, it can be used to apply labels to new, unknown data.
@@ -30,15 +30,15 @@
 *** Limited Object Hierarchy
 *** Composition
 *** Sensible Defaults
-** Basics of the API
-*** Choose a class of model by importing the appropriate estimator class from Scikit-Learn.
-*** Choose model hyperparameters by instantiating this class with desired values.
-*** Arrange data into a features matrix and target vector following the discussion above.
-*** Fit the model to your data by calling the "fit()" method of the model instance.
-*** Apply the model to new data:
+*** Basics of the API
+**** Choose a class of model by importing the appropriate estimator class from Scikit-Learn.
+**** Choose model hyperparameters by instantiating this class with desired values.
+**** Arrange data into a features matrix and target vector following the discussion above.
+**** Fit the model to your data by calling the "fit()" method of the model instance.
+**** Apply the model to new data:
 **** For supervised learning, often we predict lables for the unknown data using the "predict()" method.
 **** For unsupervised learning, we often transform or infer properties of the data using the "transform()" or "predict()" method.
-** Supervised learning example: Simple linear regression
+*** Supervised learning example: Simple linear regression
    Fitting a line to (x,y) data. (To edit src C-c ')
 
    #+BEGIN_SRC python
@@ -67,7 +67,7 @@
      Xfit = xfit[:, np.newaxis]
      yfit = model.predict(Xfit)
    #+END_SRC
-** Supervised learning example: Iris classification
+*** Supervised learning example: Iris classification
    We will use Gaussian naive Bayes (GnB).
    Fast with no hyperparameters to choose, GnB is often a good model to use as a baseline classification.
 
@@ -84,3 +84,150 @@
      y_model = model.predict(Xtest)
      print(accuarcy_score(ytest, y_model))
    #+END_SRC
+*** Unsupervised learning example: Iris dimensionality
+   Reduce the dimensionality of the Iris data.
+   The task of dimensionality reduction is to ask whether there is a suitable
+   lower-dimensional representation that retains the essential features of the data.
+   We will use Principal Component Analysis, which is a fast linear dimensionality
+   reduction technique.
+
+   #+BEGIN_SRC python
+     from sklearn.decomposition import PCA
+     import seaborn as sns
+
+     model = PCA(n_components=2)
+     model.fit(X_iris)
+     X_2D = model.transform(X_iris)
+     iris['PCA1'] = X_2D[:, 0]
+     iris['PCA2'] = X_2D[:, 1]
+     sns.lmplot("PCA1", "PCA2", hue='species', data=iris, fit_reg=False)
+   #+END_SRC
+*** Unsupervised learning: Iris clustering
+   We will use a powerful clustering method called a Gaussian mixture model (GMM).
+   A GMM attempts to model the data as a collection of Gaussian blobs.
+
+   #+BEGIN_SRC python
+     from sklearn.mixture import GMM
+     import seaborn as sns
+
+     model = GMM(n_components=3, covariance_type='full')
+     model.fit(X_iris)
+     y_gmm = model.predict(X_iris)
+     iris['cluster'] = y_gmm
+     sns.lmplot("PCA1", "PCA2", data=iris, hue='species', col='cluster', fit_reg=False)
+   #+END_SRC
+** Application: Exploring Hand-written Digits
+*** Loading and visualizing the digits data
+    #+BEGIN_SRC python
+      from sklearn.datasets import load_digits
+      import matplotlib.pyplot as plt
+
+      # Load dataset
+      digits = load_digits()
+      print(digits.image.shape)
+      # Visualize data
+      fig, axes = plt.subplots(10, 10, figsize=(8, 8),
+                               subplot_kw={'xticks':[], 'yticks':[]},
+                               gridspec_kw=dict(hspace=0.1, wspace=0.1))
+
+      for i, ax in enumerate(axes.flat):
+          ax.imshow(digits.images[i], cmap='binary', interpolation='nearest')
+          ax.text(0.05, 0.05, str(digits.target[i]),
+                  transform=ax.transAxes, color='green')
+
+      X = digits.data
+      print(X.shape)
+
+      y = digits.target
+      print(y.shape)
+    #+END_SRC
+*** Classification on digits
+    #+BEGIN_SRC python
+      from sklearn.naive_bayes import GaussianNB
+      from sklearn.metrics import accuracy_score
+      from sklearn.metrics import confusion_matrix
+      import seaborn as sns
+
+      Xtrain, Xtest, ytrain, ytest = train_test_split(X, y, random_state=0)
+      model = GaussianNB()
+      model.fit(Xtrain, ytrain)
+      y_model = model.predict(Xtest)
+      print(accuracy_score(ytest, y_model))
+
+      # Where is the data wrong
+      mat = confusion_matrix(ytest, y_model)
+      sns.heatmap(mat, square=True, annot=True, cbar=False)
+      plt.xlabel('predict value')
+      plt.ylabel('true value')
+
+      # Print with predicted labels
+      fig, axes = plt.subplots(10, 10, figsize=(8,8),
+                               subplot_kw={'xticks':[], 'yticks':[]},
+                               gridspec_kw=dict(hspace=0.1, wspace=0.1))
+      test_images = Xtest.reshape(-1, 8, 8)
+
+      for i, ax in enumerate(axes.flat):
+          ax.imshow(test_images[i], cmap='binary', interpolation='nearest')
+          ax.text(0.05, 0.05, str(y_model[i]),
+                  transform=ax.transAxes,
+                  color='green' if (ytest[i] == y_model[i]) else 'red')
+    #+END_SRC
+* Hyperparameters and Model Validation
+** Thinking abount model validation
+*** Model validation the wrong way
+    #+BEGIN_SRC python
+      from sklearn.datasets import load_iris
+      from sklearn.neighbors import KNeighborsClassifier
+      from sklearn.metrics import accuracy_score
+
+      iris = load_iris()
+      X = iris.data
+      y = iris.target
+      model = KNeighborsClassifier(n_neighbors=1)
+      model.fit(X,y)
+      y_model = model.predict(X)
+      print(accuracy_score(y, y_model))
+    #+END_SRC
+*** Model validation the right way: Holdout sets
+    A better sense of a model's performance can be found using what's known as a holdout set:
+    that is, we hold back some subset of the data form the training of the model, and then use
+    this holdout set to check the model performance.
+    
+    #+BEGIN_SRC python
+      from sklearn.cross_validation import train_test_split
+
+      # Split the data with 50% in each set.
+      X1, X2, y1, y2 = train_test_split(X, y, random_state=0, train_size=0.5)
+      # Fit the model on one set of data
+      model.fit(X1, y1)
+      # Evaluate the model on the second set of data
+      y2_model = model.predict(X2)
+      print(accuracy_score(y2, y2_model))
+    #+END_SRC
+*** Model validation via cross-validation
+    Do a sequence of fits where each subset of the data is used both as a training set
+    and as a validation set.
+    #+BEGIN_SRC python
+      y2_model = model.fit(X1, y1).predict(X2)
+      y1_model = model.fit(X2, y2).predict(X1)
+      print(accuracy_score(y1, y1_model))
+      print(accuracy_score(y2, y2_model))
+    #+END_SRC
+    
+    Do a cross validation to use all test data.
+    #+BEGIN_SRC python
+      from sklearn.cross_validation import cross_val_score
+      print(cross_val_score(model, X, y, cv=5))
+
+      from sklearn.cross_validation import LeaveOneOut
+      scores = cross_val_score(model, X, y, cv=LeaveOneOut(len(X)))
+      print(scores.mean())
+    #+END_SRC
+** Selecting the best model
+   If our estimator is underperforming, how should we move forward?
+**** Use a more complicated / more flexible model
+**** Use a less complicated / less flexible model
+**** Gather more training samples
+**** Gather more data to add features to each sample
+*** The Bias-variance trade-off
+
