@@ -230,4 +230,116 @@
 **** Gather more training samples
 **** Gather more data to add features to each sample
 *** The Bias-variance trade-off
+    Underfit the data (high bias).
+    Overfit the data (high variance).
+*** Validation curves in Scikit-Learn
+    #+BEGIN_SRC python
+      from sklearn.preproccesing import PolynomialFeatures
+      from sklearn.linear_model import LinearRegression
+      from sklearn.pipeline import make_pipeline
+      import numpy as np
 
+      def PolynomialRegression(degree=2, **kwargs):
+          return make_pipeline(PolynomialFeatures(degree),
+                               LinearRegression(**kwargs))
+
+      def make_data(N, err=1.0, rseed=1):
+          # randomly sample the data
+          rng = np.random.RandomState(rseed)
+          X = rng.rand(N, 1) ** 2
+          y = 10 - 1. / (X.ravel() + 0.1)
+          if err > 0:
+              y += err * rng.randn(N)
+          return X, y
+
+      X, y = make_data(40)
+    #+END_SRC
+** Learning curves
+   One important aspect of model complexity is that the optimal model will generally depend on the size
+   of your training data.
+**** A model of a given complexity will overfit a small dataset. (High training score, low validation score).
+**** A model of a given complexity will underfit a large dataset. (High validation score, low training score).
+**** A model will never give a better score to the validation set than the training set.
+*** Learning curves in Scikit-Learn
+    This is a valuable diagnostic, because it gives us a visual depiction of how our model responds
+    to increasing training data.
+    In particular, when your learning curve has already converged, adding more training data will not
+    significantly improve the fit!
+    The only way to incresae the converged score is to use a different (usually more complicated)
+    model.
+** Validation in Practice: Grid Search
+   Here is an example of using grid search to find the optimal polynomial model. We will explore
+   a 3-dimensional grid of model features; namely the polynomial degree, the flag telling us whether
+   to fit the intercept, and the flag telling us whether to normalize the problem.
+   #+BEGIN_SRC python
+     from sklearn.grid_search import GridSearchCV
+
+     param_grid = {'polynomialfeatures__degree': np.arange(21),
+                   'linearregression__fit_intercept': [True, False],
+                   'linearregression__normalize': [True, False]}
+
+     grid = GridSearchCV(PolynomialRegression(), param_grid, cv=7)
+
+     grid.fit(X,y)
+
+     print(grid.best_params_)
+   #+END_SRC
+* Feature Engineering
+** Categorical Features
+   One proven technique is to use one-hot encoding, which effectively creates extra columns indicating
+   the presence or absence of a category with a value of 1 or 0.
+   When your data comes as a list of dictionaries, Scikit-Learn's DictVectorizer will do this for you.
+** Text Features
+   One of the simplest methods of encoding data is by word counts.
+   #+BEGIN_SRC python
+     from sklearn.feature_extraction.text import CountVectorizer
+
+
+     sample = ['problem of evil',
+               'evil queen',
+               'horizon problem']
+
+     vec = CountVectorizer()
+     X = vec.fit_transform(sample)
+   #+END_SRC
+   Another approach is known as term frequency-inverse document frequency (TF-IDF) which weights
+   the word counts by a measure of how often they appear in the documents.
+   #+BEGIN_SRC python
+     from sklearn.feature_extraction.text import TfidfVectorizer
+     import pandas as pd
+
+
+     sample = ['problem of evil',
+               'evil queen',
+               'horizon problem']
+
+     vec = TfidfVectorizer()
+     X = vec.fit_transform(sample)
+     pd.DataFrame(X.toarray(), columns=vec.get_feature_names())
+   #+END_SRC
+** Image Features
+   Scikit-Image project.
+** Derived Features
+** Imputation of Missing Data
+   Often, the NaN value is used to mark missing values.
+   When applying a typical machine learning model to such data, we will need to first replace such missing
+   data with some appropiate fill value. This is known as imputation of missing values.
+   #+BEGIN_SRC python
+     from sklearn.preprocessing import Imputer
+
+     imp = Imputer(strategy='mean')
+     X2 = imp.fit_transform(X)
+   #+END_SRC
+** Feature Pipelines
+   We might want a proccesing pipeline that looks something like this:
+**** Impute missing values using the mean.
+**** Transform features to quadratic.
+**** Fit a linear regression.
+   #+BEGIN_SRC python
+     from sklearn.pipeline import make_pipeline
+
+     model = make_pipeline(Imputer(strategy='mean'),
+                           PolynomialFeatures(degree=2),
+                           LinearRegression())
+   #+END_SRC
+* In Depth: Naive Bayes Classifications
