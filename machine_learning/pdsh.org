@@ -343,3 +343,48 @@
                            LinearRegression())
    #+END_SRC
 * In Depth: Naive Bayes Classifications
+  Naive Bayes models are a group of extremely fast and simple classification algorithms thar are
+  often suitable for very high-dimensional datasets.
+** Bayesian Classification
+** Gaussian Naive Bayes
+   The assumption is that data from each label is drawn from a simple Gaussian distribution.
+   #+BEGIN_SRC python
+     import matplotlib.pyplot as plt
+     import numpy as np
+     import seaborn as sns
+     from sklearn.datasets import make_blobs
+     from sklearn.naive_bayes import GaussianNB
+
+
+     X, y = make_blobs(100, 2, centers= 2, random_state=2, cluster_std=1.5)
+     plt.scatter(X[:,0], X[:,1], c=y, s=50, cmap='RdBu')
+
+     model = GaussianNB()
+     model.fit(X,y)
+
+     rng = np.random.RandomState(0)
+     Xnew = [-6, -14] + [14, 18] * rng.rand(2000, 2)
+     ynew = model.predict(Xnew)
+   #+END_SRC
+** Multinomial Naive Bayes
+   The features are assumed to be generated from a simple multinomial distribution. The multinomial
+   distribution describes the probability of observing counts among a number of categories, and thus
+   multinomial naive Bayes is most appropriate for features that represent counts or count rates.
+*** Example: Classifying Text
+    One place where multinomia navie Bayes is ofrten used is text classification, where the features 
+    are related to word counts or frequencies within the documents to be classified.
+    #+BEGIN_SRC python
+      from sklearn.datasets import fetch_20newsgroups
+
+
+      data = fetch_20newsgroups()
+      data.target_names
+
+      categories = ['talk.religion.misc', 'soc.religion.christian',
+                    'sci.space', 'comp.graphics']
+
+      train = fetch_20newsgroups(subset='train', categories=categories)
+      test = fetch_20newsgroups(subset='test', categories=categories)
+
+      print(train.data[5])
+    #+END_SRC
