@@ -371,11 +371,19 @@
    distribution describes the probability of observing counts among a number of categories, and thus
    multinomial naive Bayes is most appropriate for features that represent counts or count rates.
 *** Example: Classifying Text
-    One place where multinomia navie Bayes is ofrten used is text classification, where the features 
+    One place where multinomial navie Bayes is often used is text classification, where the features 
     are related to word counts or frequencies within the documents to be classified.
     #+BEGIN_SRC python
       from sklearn.datasets import fetch_20newsgroups
+      from sklearn.feature_extraction.text import TfidfVectorizer
+      from sklearn.naive_bayes import MultinomialNB
+      from sklearn.pipeline import make_pipeline
+      from sklearn.metrics import cofusion_matrix
 
+
+      def predict_category(s, train=train, model=model):
+          pred = model.predict([s])
+          return train.target_names[pred[0]]
 
       data = fetch_20newsgroups()
       data.target_names
@@ -386,5 +394,159 @@
       train = fetch_20newsgroups(subset='train', categories=categories)
       test = fetch_20newsgroups(subset='test', categories=categories)
 
-      print(train.data[5])
+      model = make_pipeline(TfidfVectorizer(), MultinomialNB())
+      model.fit(train.data, train.target)
+      labels = model.predict(test.data)
+
+      mat = confusion_matrix(test.target, labels)
+
+      print(predict_category('sending a payload to the ISS'))
+      print(predict_category('discussing islam vs atheism'))
     #+END_SRC
+** When To Use Naive Bayes
+   Will generaly not perform as well as a more complicated model. That said, they have
+   several advantages:
+**** They are extremely fast for both training and prediction.
+**** They provide straightforward probabilistic prediction.
+**** They are often very easily interpretable.
+**** They have very few (if any) turntable parameters.
+   Naive Bayes classifiers tend to perform well in one of the following situations:
+**** When the naive assumptions actually match the data.
+**** For very well-separated categories, when model complexity is less important.
+**** For very high-dimensional data, when model complexity is less important.
+* In Depth: Linear Regression
+  #+BEGIN_SRC python
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    import numpy as np
+    from sklearn.linear_model import LinearRegression
+
+
+    rng = np.random.RandomState(1)
+    x = 10 * rng.rand(50)
+    y = 2 * x - 5 + rng.randn(50)
+    plt.scatter(x, y)
+
+    model = LinearRegression(fit_intercept=True)
+    model.fit(x[:, np.newaxis], y)
+    xfit = np.linspace(0, 10, 1000)
+    yfit = model.predict(xfit[:, np.newaxis])
+
+    plt.scatter(x, y)
+    plt.plot(xfit, yfit)
+
+    print(model.coef_[0])
+    print(model.intercept_)
+  #+END_SRC
+  The LinearRegression estimator is much more capable than this, it can handle multidimensional
+  linear models of the form y = a0 + a1x1 + a2x2 + ...
+  #+BEGIN_SRC python
+    rng = np.random.RandomState(1)
+    X = 10 * rng.rand(100, 3)
+    y = 0.5 + np.dot(X, [1.5, -2., 1.])
+
+    model.fit(X, y)
+    print(model.intercept_)
+    print(model.coef_)
+  #+END_SRC
+** Basis Function Regression
+*** Polynomial basis functions
+    #+BEGIN_SRC python
+      from sklearn.preprocessing import PolynomialFeatures
+      from sklearn.pipeline import make_pipeline
+
+
+      x = np.array([2,3,4])
+      poly = PolynomialFeatures(3, include_bias=False)
+      poly.fit_transform(x[:, None])
+      poly_model = make_pipeline(PolynomialFeatures(7),
+                                 LinearRegression())
+      rng = np.random.RandomState(1)
+      x = 10 * rng.rand(50)
+      y = np.sin(x) + 0.1 * rng.randn(50)
+
+      poly_model.fit(x[:, np.newaxis], y)
+      yfit = poly_model.predict(xfit[:, np.newaxis])
+
+      plt.scatter(x, y)
+      plt.plot(xfit, yfit)
+    #+END_SRC
+*** Gaussian basis functions
+    #+BEGIN_SRC python
+      from sklearn.base import BaseEstimator, TransformerMixin
+
+
+      class GaussianFeatures(BaseEstimator, TransformerMixin):
+          """Uniformly spaced Gaussian features for one-dimensional input."""
+
+          def __init__(self, N, width_factor=2.0):
+              self.N = N
+              self.width_factor = width_factor
+
+          @staticmethod
+          def _gauss_basis(x, y, width, axis=None):
+              arg = (x - y) / width
+              return np.exp(-0.5 * np.sum(arg ** 2, axis))
+
+          def fit(self, X, y=None):
+              # create N centers spread along the data range
+              self.centers_ = np.linspace(X.min(), X.max(), self.N)
+              self.width_ = self.width_factor * (self.centers_[1] - self.centers[0])
+              return self
+
+          def transform(self, X):
+              return self._gauss_basis(X[:, :, np.newaxis],
+                                       self.centers_,
+                                       self.width_,
+                                       axis=1)
+
+      gauss_model = make_pipeline(GaussianFeatures(20),
+                                  LinearRegression())
+
+      gauss_model.fit(x[:,np.newaxis], y)
+      yfit = gauss_model.predict(xfit[:, np.newaxis])
+
+      plt.scatter(x, y)
+      plt.plot(xfit, yfit)
+      plt.xlim(0, 10)
+    #+END_SRC
+** Regularization
+   #+BEGIN_SRC python
+     model = make_pipeline(GaussianFeatures(30),
+                           LinearRegression())
+     model.fit(x[:, np.newaxis], y)
+
+     plt.scatter(x,y)
+     plt.plot(xfit, model.predict(xfit[:, np.newaxis]))
+     plt.xlim(0,10)
+     plt.ylim(-1.5, 1.5)
+
+     def basis_plot(model, title=None):
+         fig, ax = plt.subplots(2, sharex=True)
+         model.fit(x[:, np.newaxis], y)
+         ax[0].scatter(x,y)
+         ax[0].plot(xfit, model.predict(xfit[:, np.newaxis]))
+         ax[0].set(xlabel='x', ylabel='y', ylim=(-1.5, 1.5))
+
+         if title:
+             ax[0].set_title(title)
+
+         ax[1].plot(model.steps[0][1].centers_,
+                    model.steps[1][1].coef_)
+         ax[1].set(xlabel='basis location',
+                   ylabel='coefficient',
+                   xlim=(0,10))
+
+     model = make_pipeline(GaussianFeatures(30), LinearRegression())
+     basis_plot(model)
+   #+END_SRC
+   The lower panel of this figure shows the amplitude of the basis function at each location.
+   This typical over-fitting behavior when basis functions overlap.
+   We know that such behavior is problematic, and it would be nice if we could limit such spikes
+   explicitly in the model by penalizing large values of the model parameters.
+   Such a penalty is known as regularization, and comes in several forms.
+*** Ridge regression (L2 Regularization)
+    This proceeds by penalizing the sum of squares (2-norms) of the model coefficients; in this case,
+    the penalty of the model fit would be:
+    P = alpha * (sum n=1 to N of (theta ** 2)_n)
+    where alpha is a free parameter that controls the strength of the penalty.
