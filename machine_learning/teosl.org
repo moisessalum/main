@@ -1,0 +1,18 @@
+[[https://web.stanford.edu/~hastie/ElemStatLearn//printings/ESLII_print12.pdf][The Elements of Statistical Learning]]
+
+* Introduction
+  In a typical scenario, we have an outcome measurement, usually quantitive or categorical
+  that we wish to predict based on a set of features. We have a training set of data,
+  in which we observe the outcome and feature measurements for a set of objects.
+* Overview of Supervised Learning
+** Introduction
+   Inputs = Predictors = Independent Variables = Features
+   Outputs = Responses = Dependent Variables
+** Variable Types and Terminology
+   A variable type is /ordered categorical/, such as /small/, /medium/ and /large/, where
+   there is an ordering between the values, but no metric notion is appropriate.
+   
+   Qualitative variables are typically represented numerically by codes.
+   The easiest case is when there are only 2 classes or categories.
+   For reasons that will become apparent, such numeric codes are sometimes referred
+   to as /targets/. 
