@@ -15,4 +15,31 @@
    Qualitative variables are typically represented numerically by codes.
    The easiest case is when there are only 2 classes or categories.
    For reasons that will become apparent, such numeric codes are sometimes referred
-   to as /targets/. 
+   to as /targets/.
+
+   When there are more than two categories, several alternatives are available.
+   The most useful and commonly used coding is via /dummy variables/.
+   We will typically denote an input variable by the symbol X.
+   Quantitative outputs will be denoted by Y and qualitative outputs by G.
+
+   For the moment we can loosely state the learning task as follows:
+   given the value of an input vector X, make a good prediction of the output Y,
+   denoted by ^Y (pronunced "y-hat"). If Y takes values in R, then so should ^Y.
+** Two Simple Approaches to Prediction: Least Squares and Nearest Neighbors
+   The linear model makes huge assumptions about structure and yields stable but possibly
+   inaccurate predictions. The method of k-nearest neighbors makes very mild structural
+   assumptions: its predictions are often accurate but can be unstable.
+*** Linear Models and Least Squares
+    Given a vector of inputs X^t = (X1, X2, ..., Xp), we predict the output Y.
+    Often it's convenient to write the linear model in vector form as an inner product.
+*** Nearest-Neighbor Methods
+    Nearest-neighbor methods use those observations in the training set T closest
+    in input space to x to form ^Y.
+    For k-nearest-neighbor fits, the error on the training data should be
+    approximately an increasing function of k, and will always be 0 for k = 1.
+*** From Least Squares to Nearest Neighbors
+    The linear decision boundry from least squares is very smooth, and apparently
+    stable to fit. It has low variance and potentially high bias.
+    On the other hand, the k-nearest-neighbor procedures do not appear to rely
+    on any stringet assumptions - high variance and low bias.
+** Statistical Decision Theory
