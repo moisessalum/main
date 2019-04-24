@@ -43,3 +43,29 @@
     On the other hand, the k-nearest-neighbor procedures do not appear to rely
     on any stringet assumptions - high variance and low bias.
 ** Statistical Decision Theory
+   Least squares assumes f(x) is well approximated by a globally linear function.
+   k-nearest neighbors assumes f(x) is well approximated by a locally constant function.
+** Local Methods in High Dimensions
+   It would seem that with a reasonably large set of training data, we could always
+   approximate the theoretically optimal conditional expectation by k-nearest-neighbor
+   averaging, since we should be able to find a fairly large neighborhood of
+   observations close to any x and average them. This approach and our intuition breaks
+   down in high dimensions, and the phenomenon is commonly referred to as the curse
+   of dimensionality.
+** Statistical Models, Supervised Learning and Function Approximation
+*** A Statistical Model for the Join Distribution Pr(X,Y)
+*** Supervised Learning
+*** Function Approximation
+** Structured Regression Models
+*** Difficulty of the Problem
+** Classes of Restricted Estimators
+*** Roughness Penalty and Bayesian Methods
+*** Basis Functions and Dictionary Methods 
+** Model Selection and the Bias-Variance Tradeoff
+* Linear Methods for Regression
+** Introduction
+   For prediction purposes they can sometimes outperform fancier nonlinear models,
+   especially in situations with small numbers of training cases, low signal-to-noise
+   ratio or sparse data. Finally, linear methods can be applied to transformations of
+   the inputs and this considerably expands their scope.
+** Linear Regression MOdels and Least Squares
