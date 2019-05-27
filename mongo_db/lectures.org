@@ -1,0 +1,55 @@
+* Introduction
+** How it works?
+   Database server that allows to run different databases on it.
+   
+   Database > Collection > Document > Object (format from JavaScript).
+   Schemaless
+
+   Key = "Name of key": "Value of key"
+   The value of the keys can be booleans, numbers, text, nested data, lists.
+
+   Mongo converts data to BSON.
+** MongoDB Ecosystem
+*** MongoDB Database
+**** Self-Managed / Enterprise
+***** CloudManager / OpsManager
+**** Atlas (Cloud)
+**** Mobile
+**** Compass (Graphical User Interface)
+**** BI Connectors
+**** MongoDB Charts
+*** Stitch
+    Serverless backend solution.
+**** Serverless Query API
+     Toolset to query DB directly from inside client-side apps.
+**** Serverless Functions
+     Execute JS code in the cloud.
+**** DB Triggers
+     Listen to events in the DB.
+**** Real-Time Sync
+     Synchronize a DB in the cloud with a mobile device.
+** Working with MongoDB
+*** Application
+**** Frontend (UI)
+**** Backend (Server)
+***** Drivers
+      Queries from Backend to MongoDB Server
+****** Node.js
+****** Java
+****** Python
+***** MongoDB Shell
+      Queries from Backend to MongoDB Server
+*** Data
+**** MongoDB Server
+     MongoDB Server communicates with Storage Engine.
+**** Storage Engine
+     Storage Engine File/Data Access to DB
+**** DB
+
+*** Data Closer look
+**** MongoDB Server
+     Connects to
+**** Storage Engine
+     The storage engine connects to DB but the R/W process is slow.
+     So this also connects to in memory data where R/W is fast.
+**** DB (or in memory data)

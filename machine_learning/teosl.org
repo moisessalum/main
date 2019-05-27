@@ -68,4 +68,4 @@
    especially in situations with small numbers of training cases, low signal-to-noise
    ratio or sparse data. Finally, linear methods can be applied to transformations of
    the inputs and this considerably expands their scope.
-** Linear Regression MOdels and Least Squares
+** Linear Regression Models and Least Squares
