@@ -53,3 +53,72 @@
      The storage engine connects to DB but the R/W process is slow.
      So this also connects to in memory data where R/W is fast.
 **** DB (or in memory data)
+* Understanding the Basics & CRUD Operations
+** Databases, Collections and Documents
+   One or more databases on a data base server.
+   Each database can hold one or more collections.
+   Collection = Table in SQL.
+   In a collection you can have one or more documents.
+   Documents are the data pieces you're storing in the DB.
+   All these are created implicitly.
+** JSON vs BSON
+   JSON to BSON. MongoDB drivers converts to BSON.
+   BSON support additional types.
+** CRUD Operations
+*** Create
+**** insertOne(data, options)
+***** db.collection.insertOne({data:value})
+**** insertMany(data, options)
+***** db.collection.insertMany([{data:value},{data1:value1}])
+*** Read
+**** find(filter, options)
+***** db.collection.find() (Get all documents)
+***** db.collection.find({key: true}) (Get all documents where key exists)
+***** db.collection.find({key: {$gt: x}}) (Get all documents where key is greater than x)
+***** db.collection.find().array
+***** db.collection.find({"key.key_1": x}) (Find key_1 value x which is nested in key)
+**** findOne(filter, options)
+*** Update
+**** updateOne(filter, data, options)
+***** db.collection.updateOne({_id: x}, {$set: {y: value}}) (Find object where _id is x, then set (insert or update) y to value)
+**** updateMany(filter, data, options)
+**** replaceOne(filter, data, options)
+***** db.collection.replaceOne({_id: x}, {y: value, z:val}) (Find object where _id is x and then replace all information with {y:value, z:val})
+**** update(filter, data)
+***** db.collection.update({_id: x}, {y: value}) (Find object where _id is x, and override all information and set {y: value})
+*** Delete
+**** deleteOne(filter, options)
+**** deleteMany(filter, options)
+** Find cursor
+   Find returns a cursor object that allows to cycle through the results.
+** Projection
+   Projection is when you have all the information of a document in your DB and you only want a subset of that data in your app.
+   It's like filtering information from the DB server, before sending information.
+*** db.collection.find({}, {x: 1, _id:0}) (Find object and project showing key x and not showing key _id)
+** Embedded Documents
+   Up to 100 levels of nesting (hard limit).
+   Overall document size > 16 MB / document.
+** Array
+   Array of embedded documents
+   Arrays can hold ANY data.
+** Resetting Database or Collection
+   db.dropDatabase()
+   db.myCollection.drop()
+* Schemas and Relations: How to Structure Documents
+** Schema-less or Not?
+   MongoDB enforces no schemas!
+** Data Types
+*** Text: "max"
+*** Boolean: true
+*** Number
+**** int32 (Integer): 55
+**** int64 (NumberLong): 100000000000000000 
+**** NumberDecimal (high precision floating point values): 12.99
+*** ObjectId: ObjectId("sfasd")
+*** ISODate: ISODate("2018-09-09")
+*** Timestamp: Timestamp(11421532)
+*** Embedded Document: {"a": {...}}
+*** Array: {"b": [...]}
+  db.stats()
+  db.collection.insertOne({a: NumberInt(1)})
+  typeof db.collection.findOne().key
