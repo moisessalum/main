@@ -122,3 +122,21 @@
   db.stats()
   db.collection.insertOne({a: NumberInt(1)})
   typeof db.collection.findOne().key
+  new Date()
+  new Timestamp()
+** Limits
+   All embedded documents must be <= 16 Mb.
+   Only 100 levels of embedded documents.
+   [[https://docs.mongodb.com/manual/reference/limits/][All limits]]
+   [[https://docs.mongodb.com/manual/reference/bson-types/][All data types]]
+   Int32 = +- 2,147,483,647
+   Int64 = +- 9,223,372,036,854,775,807
+   NumberInt() = Int32
+   NumberLong() = Int64
+   Inserting a number from shell is a normal double.
+   NumberDecimal() is a high-precision double.
+** Find examples
+   db.patients.findOne().diseaseSummary
+   var dsid = db.patients.findOne().diseaseSummary
+   db.diseaseSummaries.findOne({_id: dsid})
+   THIS IS NOT EFFICIENT
