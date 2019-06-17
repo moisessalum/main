@@ -11,4 +11,4 @@ def filter_sentence_length(sentences_l1, sentences_l2, min_len=0, max_len=20):
     filtered_sentences_l1 = []
     filtered_sentences_l2 = []
     for i in range(len(sentences_l1)):
-        pass
+        if min_len 
