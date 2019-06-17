@@ -140,3 +140,78 @@
    var dsid = db.patients.findOne().diseaseSummary
    db.diseaseSummaries.findOne({_id: dsid})
    THIS IS NOT EFFICIENT
+** Joining with $lookup (when referencing collections)
+   db.collection.aggregate([$lookup: {from: "foreign_collection", localField: "local_id", foreignField: "foreign_id", as: "alias"}}]).pretty()
+** Schema Validation
+*** validationLevel
+    Which documents get validated?
+**** strict
+     All inserts and updates
+**** moderate
+     All inserts and updates are to correct docuemnts that were valid before.
+*** validationAction
+**** error
+     Throw error and deny insert / update
+**** warn
+     Log warning but proceed
+**** Examples
+***** Create Collection
+      db.createCollection("posts", 
+                         {validator: 
+                         {$jsonSchema: 
+                         {bsonType: "object",
+                         required: ["title", "text", "creator", "comments"],
+                         properties: {
+                         title: {
+                         bsonType: "string",
+                         description: "must be a string"}}}}})
+***** Run command to change collection validation
+     db.runCommand({
+     collMod: 'posts',
+     validator: {
+     $jsonSchema: {
+     bsonType: 'object',
+     required: ['title', 'text', 'creator', 'comments'],
+     properties: {
+     title: {
+     bsonType: 'string',
+     description: 'must be a string and is required'
+     },
+     text: {
+     bsonType: 'string',
+     description: 'must be a string and is required'
+     },
+     creator: {
+     bsonType: 'objectId',
+     description: 'must be an objectid and is required'
+     },
+     comments: {
+     bsonType: 'array',
+     description: 'must be an array and is required',
+     items: {
+     bsonType: 'object',
+     required: ['text', 'author'],
+     properties: {
+     text: {
+     bsonType: 'string',
+     description: 'must be a string and is required'
+     },
+     author: {
+     bsonType: 'objectId',
+     description: 'must be an objectid and is required'
+     }
+     }
+     }
+     }
+     }
+     }
+     },
+     validationAction: 'warn'
+     });
+
+     collMod := Collection modification
+*** Helpful articles and docs
+    [[https://docs.mongodb.com/manual/reference/limits/][MongoDB Limits]]
+    [[https://docs.mongodb.com/manual/reference/bson-types/][MongoDB Data Types]]
+    [[https://docs.mongodb.com/manual/core/schema-validation/][Schema Validation]]
+* Working with Shell & Server
