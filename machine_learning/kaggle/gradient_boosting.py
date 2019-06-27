@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from xgboost import XGBRegressor
-from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_absolute_error, accuracy_score
 
 
 # Read the data
@@ -33,10 +33,10 @@ X_train = pd.get_dummies(X_train)
 X_valid = pd.get_dummies(X_valid)
 X_test = pd.get_dummies(X_test)
 X_train, X_valid = X_train.align(X_valid, join='left', axis=1)
-X_train, X_test = X_train.algin(X_valid, join='left', axis=1)
+X_train, X_test = X_train.align(X_valid, join='left', axis=1)
 
 # Define model
-model = XGBRegressor(n_estimators=10000, learning_rate=0.05)
+model = XGBRegressor(n_estimators=50000, learning_rate=0.05)
 
 model.fit(X_train, y_train,
           early_stopping_rounds=10,
