@@ -1,13 +1,19 @@
-import requests
-from bs4 import BeautifulSoup
 import pandas as pd
-from table_columns import columns
 
 
-df = pd.read_csv('/Users/moisessalum/Desktop/GL2018.TXT')
+df = pd.read_csv('c:/Users/mrodriguez/Desktop/GL2018.csv')
+columns = df.columns
 
-# df.columns = columns
+years = range(2000, 2018)
 
+df_list = []
+for i in years:
+    df_n = pd.read_csv('c:/users/mrodriguez/Desktop/GL{}.txt'.format(i), header=None)
+    df_list.append(df_n)
 
-print(df.shape)
-print(df)
+result = pd.concat(df_list)
+
+result.columns = columns
+
+df = df.append(result)
+df.to_csv('c:/Users/mrodriguez/Desktop/2000_2018.csv')
