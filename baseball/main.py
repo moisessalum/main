@@ -1,10 +1,13 @@
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder, OrdinalEncoder
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, BaggingClassifier
+from sklearn.ensemble import AdaBoostClassifier, GradientBoostingClassifier
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import accuracy_score
 from sklearn.pipeline import Pipeline
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
 
 
 # Read the data
@@ -45,11 +48,36 @@ for col in object_cols:
     label_X_train[col] = label_encoder.fit_transform(X_train[col])
     label_X_valid[col] = label_encoder.transform(X_valid[col])
 
-# Model
-clf = RandomForestClassifier(n_estimators=100, random_state=0)
-clf.fit(X_train, y_train)
+# Set scores to zero
 X_valid['home_score'] = 0
 X_valid['visiting_score'] = 0
 
-preds = clf.predict(X_valid)
-print(accuracy_score(y_valid, preds))
+# Naive Bayes Classifier
+nb = GaussianNB()
+nb.fit(X_train, y_train)
+preds_nb = nb.predict(X_valid)
+print("NB: ", accuracy_score(y_valid, preds_nb))
+
+# Random Forest Classifier
+clf = RandomForestClassifier(n_estimators=100, random_state=0)
+clf.fit(X_train, y_train)
+preds_rf = clf.predict(X_valid)
+print("RFC: ", accuracy_score(y_valid, preds_rf))
+
+# Bagging Classifier
+bc = BaggingClassifier(KNeighborsClassifier(), max_samples=0.5, max_features=0.5)
+bc.fit(X_train, y_train)
+preds_bc = bc.predict(X_valid)
+print("BC: ", accuracy_score(y_valid, preds_bc))
+
+# AdaBoost Classifier
+abc = AdaBoostClassifier(n_estimators=100)
+abc.fit(X_train, y_train)
+preds_abc = abc.predict(X_valid)
+print("AB: ", accuracy_score(y_valid, preds_abc))
+
+# Gradient Boosting Classifier
+gbc = GradientBoostingClassifier()
+gbc.fit(X_train, y_train)
+preds_gbc = gbc.predict(X_valid)
+print("GBC: ", accuracy_score(y_valid, preds_gbc))
