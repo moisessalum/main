@@ -2,7 +2,7 @@ import pandas as pd
 from datetime import datetime
 
 # Read data
-df = pd.read_csv('historic_1991_2018.csv', index_col=0)
+df = pd.read_csv('1991_2018.csv', index_col=0)
 
 # Convert dates and create new columns
 df['date'] = pd.to_datetime(df['date'], format='%Y%m%d')
@@ -17,13 +17,18 @@ for x in teams:
 
 # Add won games to each team by year
 year_list_df = []
-unique_year = df['year'].unique()
+# unique_year = df['year'].unique()
 unique_year = [1991]
 for year in unique_year:
     df_year = df[df['year'] == year]
-    for index, row in df_year.iterrows():
+    for ix, row in df_year.iterrows():
         if row['visiting_score'] > row['home_score']:
-            df_year[row['visiting_team']] = df_year[row['visiting_team']] + 1
+            # df_year[row['visiting_team']] = df_year[row['visiting_team']] + 1
+            print(ix)
+            index_list = df_year.loc[df_year['visiting_team']==row['visiting_team']].index.values
+            print(index_list)
+            list_value = index_list.index(ix)
+            print(list_value)
         else:
             df_year[row['home_team']] = df_year[row['home_team']] + 1
     print('Done', year)
