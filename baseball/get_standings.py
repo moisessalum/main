@@ -3,29 +3,29 @@ from datetime import datetime
 import numpy as np
 
 
-def get_new_record(winner=None, df=None, ix=None):
+def get_new_record(winner=None, df=None, current_game_index=None):
     # Update team record
     try:
-        winner = row['visiting_team']
-        all_visit_games_array = df_year[df_year['visiting_team']==winner].index.values
-        all_home_games_array = df_year[df_year['home_team']==winner].index.values
+        all_visit_games_array = df[df['visiting_team']==winner].index.values
+        all_home_games_array = df[df['home_team']==winner].index.values
         all_team_games = np.concatenate((all_visit_games_array, all_home_games_array), axis=None)
-        current_index = np.where(all_team_games==ix)[0][0]
-        if current_index == 0:
+        all_team_games.sort()
+        print("Curr:",current_game_index)
+        print(all_team_games)
+        current_game_ndarray_position = np.where(all_team_games==current_game_index)[0][0]
+        if current_game_ndarray_position == 0:
             pass
-        elif current_index > 0:
-            previous_index = current_index - 1
-            previous_game = all_team_games[previous_index]
-            print("PG", previous_game)
-            previous_record = df[winner].iloc[previous_game]
-            print("Prev rec", previous_record)
-            next_index = current_index + 1
-            next_game = all_team_games[next_index]
-            # print("Next ix", next_index)
+        elif current_game_ndarray_position > 0:
+            previous_game_ndarray_position = current_game_ndarray_position - 1
+            next_game_ndarray_position = current_game_ndarray_position + 1
+            previous_game = all_team_games[previous_game_ndarray_position]
+            print("Prev:",previous_game)
+            next_game = all_team_games[next_game_ndarray_position]
+            print("Next",next_game)
+            previous_record = df[winner].loc[previous_game]
             next_record = previous_record + 1
-            # print("Next rec", next_record)
-            df_year[winner].iloc[next_game] = next_record
-            print(df_year[winner].iloc[next_game])
+            print(next_record)
+            df.at[next_game, winner] = next_record
     except Exception as e:
         print("Visiting score exception:", e)
 
@@ -40,9 +40,9 @@ df['month'] = pd.DatetimeIndex(df['date']).month
 df = df.sort_index()
 
 # Get teams list and add to df
-teams = df['home_team'].unique()
-for x in teams:
-    df[x] = 0
+# teams = df['home_team'].unique()
+# for x in teams:
+    # df[x] = 0
 
 # Add won games to each team by year
 year_list_df = []
@@ -50,16 +50,48 @@ year_list_df = []
 unique_year = [1991]
 for year in unique_year:
     df_year = df[df['year'] == year]
-    for ix, row in df_year.iterrows():
-        print(ix)
-        # print(row['visiting_team'])
-        # print(row['home_team'])
-        if row['visiting_score'] > row['home_score']:
-            winner = row['visiting_team']
-            get_new_record(winner=winner, df=df_year, ix=ix)
-        elif row['visiting_score'] < row['home_score']:
-            winner = row['home_team']
-            get_new_record(winner=winner, df=df_year, ix=ix)
+    df_year['winner_team'] = np.where(df_year['visiting_score'] > df_year['home_score'],
+                                      df_year['visiting_team'],
+                                      df_year['home_team'])
+    for index, row in df_year.iterrows():
+        print(index)
+        visit_team_visit_games_array = df_year[df_year['visiting_team']==row['visiting_team']].index.values
+        visit_team_home_games_array = df_year[df_year['home_team']==row['visiting_team']].index.values
+        visit_team_all_games_array = np.concatenate((visit_team_visit_games_array, visit_team_home_games_array), axis=None)
+        home_team_visit_games_array = df_year[df_year['visiting_team']==row['home_team']].index.values
+        home_team_home_games_array = df_year[df_year['home_team']==row['home_team']].index.values
+        home_team_all_games_array = np.concatenate((home_team_visit_games_array, home_team_home_games_array), axis=None)
+        visit_team_all_games_array.sort()
+        home_team_all_games_array.sort()
+        # print(index)
+        # print(visit_team_all_games_array)
+        # print(home_team_all_games_array)
+        visit_team_current_game_ndarray_position = np.where(visit_team_all_games_array==index)[0][0]
+        home_team_current_game_ndarray_position = np.where(home_team_all_games_array==index)[0][0]
+        # print("VTP:", visit_team_current_game_ndarray_position)
+        # print("HTP:", home_team_current_game_ndarray_position)
+        if visit_team_current_game_ndarray_position == 0:
+            df_year['visit_record'] = 0
+        elif visit_team_current_game_ndarray_position > 0:
+            visit_current_played_games = visit_team_all_games_array[:visit_team_current_game_ndarray_position]
+            visit_game_results = df_year['winner_team'][df_year.index.isin(visit_current_played_games)]
+            visit_current_record = len(np.where(visit_game_results==row['visiting_team'])[0])
+            df_year.at[index, 'visit_record'] = visit_current_record
+
+
+
+
+
+        # all_home_games_array = df[df['home_team']==winner].index.values
+        # all_team_games = np.concatenate((all_visit_games_array, all_home_games_array), axis=None)
+
+
+        # if row['visiting_score'] > row['home_score']:
+            # winner = row['visiting_team']
+            # get_new_record(winner=winner, df=df_year, current_game_index=ix)
+        # elif row['visiting_score'] < row['home_score']:
+            # winner = row['home_team']
+            # get_new_record(winner=winner, df=df_year, current_game_index=ix)
     print('Done', year)
     year_list_df.append(df_year)
 
