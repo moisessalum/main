@@ -54,8 +54,7 @@ df = df.sort_index()
 
 # Add won games to each team by year
 year_list_df = []
-# unique_year = df['year'].unique()
-unique_year = [1991]
+unique_year = df['year'].unique()
 for year in unique_year:
     df_year = df[df['year'] == year]
     df_year['winner_team'] = np.where(df_year['visiting_score'] > df_year['home_score'],

@@ -28,7 +28,9 @@ columns = ['day_of_week',
            'winner_home_visit',
            # 'winner_team',
            'visiting_record',
-           'home_record']
+           'home_record',
+           'visiting_consecutive_record',
+           'home_consecutive_record']
 df = df_full[columns]
 
 # Separate target from predictors
@@ -49,10 +51,6 @@ object_cols = [col for col in X_train.columns if X_train[col].dtype == "object"]
 for col in object_cols:
     label_X_train[col] = label_encoder.fit_transform(X_train[col])
     label_X_valid[col] = label_encoder.transform(X_valid[col])
-
-# Set scores to zero
-# X_valid['home_score'] = 0
-# X_valid['visiting_score'] = 0
 
 # Logistic Regression
 lr = LogisticRegression()
