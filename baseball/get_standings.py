@@ -31,20 +31,16 @@ def consecutive_wins_loss(df=None, team=None, index=None):
         current_played_games = team_all_games_array[:team_current_game_ndarray_position]
         game_results = df['winner_team'][df.index.isin(current_played_games)]
         current_record = np.where(game_results==row[team+'_team'], '1', '-1')
-        current_record = list(map(int, current_record))
-        print(current_record)
-        prev_val = 0
-        while True:
-            ix = current_record.index(2, prev_val)
-            if ix == -1:
+        current_record = current_record.astype(np.int)
+        current_record_flip = np.flip(current_record)
+        get_first_value = current_record_flip[0]
+        consecutive_record = 0
+        for i in current_record_flip:
+            if i == get_first_value:
+                consecutive_record += get_first_value
+            else:
                 break
-            if current_record[ix] == current_record[ix + 1]:
-                return True
-            prev_val = ix + 1
-            print(prev_val)
-
-        # df.at[index, team+'_record'] = current_record
-
+        df.at[index, team+'_consecutive_record'] = consecutive_record
 
 
 # Read data
@@ -69,9 +65,10 @@ for year in unique_year:
                                             'visiting_team',
                                             'home_team')
     for index, row in df_year.iterrows():
-        # get_new_record(df=df_year, team='visiting', index=index)
-        # get_new_record(df=df_year, team='home', index=index)
+        get_new_record(df=df_year, team='visiting', index=index)
+        get_new_record(df=df_year, team='home', index=index)
         consecutive_wins_loss(df=df_year, team='visiting', index=index)
+        consecutive_wins_loss(df=df_year, team='home', index=index)
     print('Done', year)
     year_list_df.append(df_year)
 
