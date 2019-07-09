@@ -12,29 +12,30 @@ from sklearn.linear_model import LogisticRegression
 
 
 # Read the data
-file_path = '1991_2018.csv'
+file_path = 'result.csv'
 df_full = pd.read_csv(file_path, index_col=0)
 
 # Select columns to work on
-columns = ['game_number',
-           'day_of_week',
+columns = ['day_of_week',
            'visiting_team',
            'visiting_league',
            'visiting_team_game_number',
            'home_team',
            'home_league',
            'home_team_game_number',
-           'visiting_score',
-           'home_score',
-           'park_id']
+           'day_night_indicator',
+           'park_id',
+           'winner_home_visit',
+           # 'winner_team',
+           'visiting_record',
+           'home_record']
 df = df_full[columns]
 
-# Define a new column with the winner team
-df['winner_team'] = np.where(df['visiting_score'] > df['home_score'], 'visit', 'home')
-
 # Separate target from predictors
-y = df['winner_team']
-X = df.drop(['winner_team', 'visiting_score', 'home_score'], axis=1)
+y = df['winner_home_visit']
+# y = df['winner_team']
+X = df.drop(['winner_home_visit'], axis=1)
+# X = df.drop(['winner_team'], axis=1)
 X_train, X_valid, y_train, y_valid = train_test_split(X, y, train_size=0.8, test_size=0.2, random_state=0)
 
 # Select object columns
@@ -66,10 +67,10 @@ print("LR accuracy:", accuracy_score(y_valid, preds_lr))
 # print("NB: ", accuracy_score(y_valid, preds_nb))
 
 # Random Forest Classifier
-# clf = RandomForestClassifier(n_estimators=100, random_state=0)
-# clf.fit(X_train, y_train)
-# preds_rf = clf.predict(X_valid)
-# print("RFC: ", accuracy_score(y_valid, preds_rf))
+clf = RandomForestClassifier(n_estimators=100, random_state=0)
+clf.fit(X_train, y_train)
+preds_rf = clf.predict(X_valid)
+print("RFC: ", accuracy_score(y_valid, preds_rf))
 
 # Bagging Classifier
 # bc = BaggingClassifier(KNeighborsClassifier(), max_samples=0.5, max_features=0.5)
